@@ -136,7 +136,9 @@ class EidosSystem(val config: Config = ConfigFactory.load("eidos")) extends Conf
 
   def extractFrom(doc: Document): Vector[Mention] = {
     // get entities
+    // todo VIKAS: here is where the entities are found
     val entities = loadableAttributes.entityFinder.extractAndFilter(doc).toVector
+    // todo VIKAS: please filter these entities for ones that are entirely stop/transparent OR EidosSystem.STOP_NER
     // filter entities which are entirely stop or transparent
 //    println(s"In extractFrom() -- entities : ${entities.map(m => m.text).mkString(",\t")}")
     val filtered = loadableAttributes.ontologyGrounder.filterStopTransparent(entities)
