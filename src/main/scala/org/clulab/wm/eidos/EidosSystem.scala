@@ -136,13 +136,16 @@ class EidosSystem(val config: Config = ConfigFactory.load("eidos")) extends Conf
 
   def extractFrom(doc: Document): Vector[Mention] = {
     // get entities
+    val thing = doc.sentences.flatMap(s => s.words.zip(s.entities.get)).mkString("\t")
+    println(s"Doc words and entities: \n ${thing}")
     // todo VIKAS: here is where the entities are found
     val entities = loadableAttributes.entityFinder.extractAndFilter(doc).toVector
     // todo VIKAS: please filter these entities for ones that are entirely stop/transparent OR EidosSystem.STOP_NER
     // filter entities which are entirely stop or transparent
-//    println(s"In extractFrom() -- entities : ${entities.map(m => m.text).mkString(",\t")}")
-    val filtered = loadableAttributes.ontologyGrounder.filterStopTransparent(entities)
-//    println(s"In extractFrom() -- filtered : ${filtered.map(m => m.text).mkString(",\t")}")
+    println(s"In extractFrom() -- entities : ${entities.map(m => m.text).mkString(",\t")}")
+//    val filtered = loadableAttributes.ontologyGrounder.filterStopTransparent(entities)
+    val filtered = filterStopTransparent(entities)
+    println(s"In extractFrom() -- filtered : ${filtered.map(m => m.text).mkString(",\t")}")
     val events = extractEventsFrom(doc, State(filtered)).distinct
 //    if (!populateSameAs) return events
     //    println(s"In extractFrom() -- res : ${res.map(m => m.text).mkString(",\t")}")
@@ -228,6 +231,7 @@ class EidosSystem(val config: Config = ConfigFactory.load("eidos")) extends Conf
       (lemma, i) <- lemmas.zipWithIndex
       if !containsStopword(lemma)
       if !EidosSystem.STOP_POS.contains(tags(i))
+      if tags(i).startsWith("NN") || tags(i).startsWith("VB") || tags(i).startsWith("VB")
       if !EidosSystem.STOP_NER.contains(entities(i))
     } yield lemma
     // println(s"  * returning: ${contentful.nonEmpty}")
