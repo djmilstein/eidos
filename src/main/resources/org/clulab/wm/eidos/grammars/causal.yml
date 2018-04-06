@@ -89,8 +89,9 @@ rules:
     pattern: |
       trigger = [lemma="due" & tag=/JJ/]
       cause: Entity = nmod_to (${ conjunctions })?
-      effect: Entity = <advmod|<amod >nmod_in
+      effect: Entity = <advmod|<amod (>nmod_in)?
 
+  #--------------------------------------------
   - name: madeSyntax3-${addlabel}
     priority: ${rulepriority}
     label: ${label}
